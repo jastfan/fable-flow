@@ -1,0 +1,21 @@
+{
+  "name": "fable-flow",
+  "version": "1.0.0",
+  "description": "Fable 5.1 Multi-Agent Architect & Invariant Verification Studio for Claude Code, Cursor & Web",
+  "main": "mcp-server.js",
+  "bin": {
+    "fable-flow": "./mcp-server.js"
+  },
+  "scripts": {
+    "start": "node mcp-server.js"
+  },
+  "keywords": [
+    "mcp",
+    "claude-code",
+    "fable",
+    "agent-orchestrator",
+    "cursor"
+  ],
+  "author": "jastfan",
+  "license": "MIT"
+}

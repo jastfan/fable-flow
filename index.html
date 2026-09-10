@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FableFlow 5.1 — Multi-Agent Architect & Invariant Verification Studio</title>
+  <meta name="description" content="Fable 5.1 Architect methodology for Claude Code and Cursor: explicit task contract decomposition, worker subagent delegation, and adversarial invariant verification gates." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Top Announcement Bar -->
+  <aside class="top-announcement-bar">
+    <div class="top-bar-inner">
+      <span class="badge-pill badge-cyan">⚡ FABLE 5.1 ARCHITECT ENGINE</span>
+      <span class="top-bar-text">Multi-Agent Task Contract Decomposition • Tacit Invariant Gates • Clean-Context Audits</span>
+      <button class="copy-pill-btn" onclick="copyClaudeCommand()" id="quickCopyBtn">
+        <code>claude mcp add fable-flow -- npx -y fable-flow</code>
+        <span class="copy-tag">Copy</span>
+      </button>
+    </div>
+  </aside>
+
+  <div class="studio-container">
+
+    <!-- Navbar -->
+    <header class="navbar">
+      <div class="nav-brand">
+        <div class="brand-icon">⚡</div>
+        <div class="brand-meta">
+          <span class="brand-name">Fable<span class="brand-highlight">Flow</span></span>
+          <span class="brand-subtext">v5.1 ARCHITECT STUDIO</span>
+        </div>
+      </div>
+
+      <nav class="nav-actions">
+        <a href="#demoStudio" class="nav-item active">Visual Studio</a>
+        <a href="#pipeline" class="nav-item">4-Stage Pipeline</a>
+        <a href="#install" class="nav-item">MCP Quick Install</a>
+        <a href="https://github.com/jastfan/fable-flow" target="_blank" rel="noopener" class="btn-github">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+          <span>Star on GitHub</span>
+        </a>
+      </nav>
+    </header>
+
+    <!-- Hero Header -->
+    <section class="hero-section">
+      <div class="hero-tag-badge">
+        <span class="pulse-dot"></span>
+        <span>The Fable 5.1 Architecture Standard</span>
+      </div>
+      <h1 class="hero-title">Stop Letting AI Blindly Guess Code. <br/><span class="text-gradient">Orchestrate with Invariant Gates.</span></h1>
+      <p class="hero-subtitle">
+        Traditional coding agents rush to write lines of code without considering tacit assumptions.
+        <strong>FableFlow</strong> puts <strong>Claude Fable 5.1</strong> as the Master Architect: decomposing requirements into strict contracts, delegating to worker subagents, and gating delivery behind adversarial invariant checks.
+      </p>
+    </section>
+
+    <!-- Interactive Visual Studio -->
+    <section class="studio-workspace" id="demoStudio">
+      
+      <!-- Left Column: Architect Input & Presets -->
+      <div class="workspace-col col-composer">
+        <div class="card-glass studio-card">
+          <div class="card-header-bar">
+            <div class="header-meta">
+              <span class="step-num">01</span>
+              <h3>Architect Input &amp; Presets</h3>
+            </div>
+            <span class="status-indicator live">Interactive</span>
+          </div>
+
+          <p class="input-hint">Select a high-friction engineering problem or type your custom requirement:</p>
+          
+          <!-- Preset Buttons -->
+          <div class="preset-pills">
+            <button class="preset-btn active" onclick="selectPreset('auth')">🔒 Auth Single-Use Token</button>
+            <button class="preset-btn" onclick="selectPreset('stream')">⚡ Bounded Stream O(1)</button>
+            <button class="preset-btn" onclick="selectPreset('db')">🗄️ Zero-Downtime Migration</button>
+            <button class="preset-btn" onclick="selectPreset('video')">🎬 Agent Video Timeline</button>
+          </div>
+
+          <div class="input-wrapper">
+            <label for="taskInput" class="input-label">Task Requirement Prompt</label>
+            <textarea id="taskInput" rows="5" class="studio-textarea"></textarea>
+          </div>
+
+          <!-- Multi-Agent Model Configuration -->
+          <div class="agent-lanes-config">
+            <div class="lane-item">
+              <span class="lane-label">Architect:</span>
+              <span class="lane-val badge-fable">Claude Fable 5.1 (Planning &amp; Spec)</span>
+            </div>
+            <div class="lane-item">
+              <span class="lane-label">Worker Lane:</span>
+              <span class="lane-val badge-worker">GPT-5.6 / Sonnet (Implementation)</span>
+            </div>
+            <div class="lane-item">
+              <span class="lane-label">QC Gate:</span>
+              <span class="lane-val badge-qc">Clean-Context Fable 5.1 (Invariant Audit)</span>
+            </div>
+          </div>
+
+          <button class="btn-primary-glow" id="runFlowBtn" onclick="runArchitectSimulation()">
+            <span class="btn-icon">⚡</span>
+            <span>Run FableFlow Architect Pipeline</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Right Column: 4-Stage Execution Visualizer -->
+      <div class="workspace-col col-visualizer" id="pipeline">
+        <div class="card-glass studio-card">
+          <div class="card-header-bar">
+            <div class="header-meta">
+              <span class="step-num">02</span>
+              <h3>Live 4-Stage Execution Visualizer</h3>
+            </div>
+            <span class="pipeline-status" id="pipelineStatusBadge">Ready for Execution</span>
+          </div>
+
+          <div class="pipeline-track">
+            
+            <!-- Stage 1 -->
+            <div class="pipeline-stage-card" id="stage1Card">
+              <div class="stage-header">
+                <div class="stage-title-wrap">
+                  <span class="stage-badge" id="stage1Badge">STAGE 1</span>
+                  <h4>Architect Decomposition &amp; Tacit Invariants</h4>
+                </div>
+                <span class="stage-pill" id="stage1Owner">Owner: Claude Fable 5.1</span>
+              </div>
+              <div class="stage-body" id="stage1Body">
+                <p class="placeholder-text">Click 'Run FableFlow Architect Pipeline' to generate contract...</p>
+              </div>
+            </div>
+
+            <!-- Stage 2 -->
+            <div class="pipeline-stage-card" id="stage2Card">
+              <div class="stage-header">
+                <div class="stage-title-wrap">
+                  <span class="stage-badge" id="stage2Badge">STAGE 2</span>
+                  <h4>Worker Subagent Task Allocation</h4>
+                </div>
+                <span class="stage-pill" id="stage2Owner">Owner: Implementation Lane</span>
+              </div>
+              <div class="stage-body" id="stage2Body">
+                <p class="placeholder-text">Awaiting Stage 1 contract sign-off...</p>
+              </div>
+            </div>
+
+            <!-- Stage 3 -->
+            <div class="pipeline-stage-card" id="stage3Card">
+              <div class="stage-header">
+                <div class="stage-title-wrap">
+                  <span class="stage-badge" id="stage3Badge">STAGE 3</span>
+                  <h4>Adversarial Invariant Verification Gate</h4>
+                </div>
+                <span class="stage-pill" id="stage3Owner">Owner: Fable QC Gate</span>
+              </div>
+              <div class="stage-body" id="stage3Body">
+                <p class="placeholder-text">Awaiting worker subagent patch...</p>
+              </div>
+            </div>
+
+            <!-- Stage 4 -->
+            <div class="pipeline-stage-card" id="stage4Card">
+              <div class="stage-header">
+                <div class="stage-title-wrap">
+                  <span class="stage-badge" id="stage4Badge">STAGE 4</span>
+                  <h4>Certified Delivery &amp; Audit Worklog</h4>
+                </div>
+                <span class="stage-pill" id="stage4Owner">Owner: Provenance Engine</span>
+              </div>
+              <div class="stage-body" id="stage4Body">
+                <p class="placeholder-text">Awaiting Stage 3 verification pass...</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- 1-Click Installation Section -->
+    <section class="install-section" id="install">
+      <div class="card-glass install-card">
+        <div class="install-header">
+          <span class="badge-pill badge-amber">1-CLICK INTEGRATION</span>
+          <h2>Connect FableFlow to Your Coding Agent Mid-Task</h2>
+          <p>Zero-dependency Model Context Protocol (MCP) server. Fully compatible with Claude Code, Cursor, Codex, and Antigravity.</p>
+        </div>
+
+        <div class="terminal-tabs">
+          <div class="tab-btns">
+            <button class="tab-btn active" onclick="switchTab('claude')">Claude Code</button>
+            <button class="tab-btn" onclick="switchTab('cursor')">Cursor IDE</button>
+            <button class="tab-btn" onclick="switchTab('antigravity')">Antigravity IDE</button>
+            <button class="tab-btn" onclick="switchTab('local')">Local Node CLI</button>
+          </div>
+
+          <div class="tab-content" id="tabClaude">
+            <pre><code>claude mcp add fable-flow -- npx -y fable-flow</code></pre>
+            <button class="copy-btn-inside" onclick="copyText('claude mcp add fable-flow -- npx -y fable-flow')">Copy Command</button>
+          </div>
+
+          <div class="tab-content hidden" id="tabCursor">
+            <pre><code>// In .cursor/mcp.json:
+{
+  "mcpServers": {
+    "fable-flow": {
+      "command": "npx",
+      "args": ["-y", "fable-flow"]
+    }
+  }
+}</code></pre>
+            <button class="copy-btn-inside" onclick="copyText('{\n  \"mcpServers\": {\n    \"fable-flow\": {\n      \"command\": \"npx\",\n      \"args\": [\"-y\", \"fable-flow\"]\n    }\n  }\n}')">Copy JSON</button>
+          </div>
+
+          <div class="tab-content hidden" id="tabAntigravity">
+            <pre><code>// In mcp_config.json:
+{
+  "mcpServers": {
+    "fable-flow": {
+      "command": "npx",
+      "args": ["-y", "fable-flow"]
+    }
+  }
+}</code></pre>
+            <button class="copy-btn-inside" onclick="copyText('{\n  \"mcpServers\": {\n    \"fable-flow\": {\n      \"command\": \"npx\",\n      \"args\": [\"-y\", \"fable-flow\"]\n    }\n  }\n}')">Copy JSON</button>
+          </div>
+
+          <div class="tab-content hidden" id="tabLocal">
+            <pre><code>git clone https://github.com/jastfan/fable-flow.git
+cd fable-flow
+node mcp-server.js</code></pre>
+            <button class="copy-btn-inside" onclick="copyText('git clone https://github.com/jastfan/fable-flow.git && cd fable-flow && node mcp-server.js')">Copy Shell</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="studio-footer">
+      <div class="footer-inner">
+        <div class="footer-left">
+          <span class="brand-name">Fable<span class="brand-highlight">Flow</span></span>
+          <span class="footer-copy">Open Source Multi-Agent Architect Standard • Maintained by <a href="https://github.com/jastfan" target="_blank">@jastfan</a></span>
+        </div>
+        <div class="footer-links">
+          <a href="https://github.com/jastfan/fable-flow" target="_blank">GitHub</a>
+          <a href="https://github.com/jastfan/fable-flow/blob/main/LICENSE" target="_blank">MIT License</a>
+          <a href="#demoStudio">Visual Studio</a>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
