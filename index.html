@@ -92,6 +92,19 @@
             <textarea id="taskInput" rows="5" class="studio-textarea"></textarea>
           </div>
 
+          <!-- Adversarial Mode Toggle -->
+          <div class="mode-toggle-wrap">
+            <span class="mode-label">Simulation Mode:</span>
+            <div class="mode-toggle-group">
+              <button class="mode-btn pass-mode active" id="modeBtnPass" onclick="setAuditMode('pass')">
+                <span>🛡️ Contract Pass</span>
+              </button>
+              <button class="mode-btn fail-mode" id="modeBtnFail" onclick="setAuditMode('fail')">
+                <span>⚠️ Inject Bug (Fail Gate)</span>
+              </button>
+            </div>
+          </div>
+
           <!-- Multi-Agent Model Configuration -->
           <div class="agent-lanes-config">
             <div class="lane-item">
@@ -244,6 +257,109 @@ cd fable-flow
 node mcp-server.js</code></pre>
             <button class="copy-btn-inside" onclick="copyText('git clone https://github.com/jastfan/fable-flow.git && cd fable-flow && node mcp-server.js')">Copy Shell</button>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Comparison Matrix: Pros & Cons of Solutions -->
+    <section class="matrix-section" id="comparison">
+      <div class="matrix-header">
+        <span class="badge-pill badge-cyan">DEEP ARCHITECTURAL COMPARISON</span>
+        <h2>Why Invariant-Gated Architecture Wins</h2>
+        <p style="color: var(--text-secondary); max-width: 700px; margin: 8px auto 0;">Compare raw unconstrained agents vs complex paid orchestrators vs FableFlow 5.1.</p>
+      </div>
+
+      <div class="matrix-table-container">
+        <table class="matrix-table">
+          <thead>
+            <tr>
+              <th>Feature / Capability</th>
+              <th>Raw Coding Agent (No Contract)</th>
+              <th>Other Fable Orchestrators</th>
+              <th class="highlight">⚡ FableFlow 5.1 (Ours)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Cost &amp; Dependencies</strong></td>
+              <td><span class="tag-warn">⚠️ Consumes token context quickly</span></td>
+              <td><span class="tag-no">❌ Requires Paid API keys ($20+/mo)</span></td>
+              <td class="highlight"><span class="tag-yes">✔ 100% Free / Zero Dependencies</span></td>
+            </tr>
+            <tr>
+              <td><strong>Tacit Invariant Detection</strong></td>
+              <td><span class="tag-no">❌ Blind (Only follows happy path)</span></td>
+              <td><span class="tag-warn">⚠️ CLI prompt instructions only</span></td>
+              <td class="highlight"><span class="tag-yes">✔ Adversarial Extraction &amp; Enforcement</span></td>
+            </tr>
+            <tr>
+              <td><strong>Interactive Visual Studio</strong></td>
+              <td><span class="tag-no">❌ None (Terminal / Chat only)</span></td>
+              <td><span class="tag-no">❌ None (Raw Python CLI)</span></td>
+              <td class="highlight"><span class="tag-yes">✔ High-Contrast 4-Stage Live Studio</span></td>
+            </tr>
+            <tr>
+              <td><strong>Adversarial Bug Injection Testing</strong></td>
+              <td><span class="tag-no">❌ Hallucinates tests verifying flawed code</span></td>
+              <td><span class="tag-no">❌ Static checks only</span></td>
+              <td class="highlight"><span class="tag-yes">✔ Real-time Invariant Gate Failure Detection</span></td>
+            </tr>
+            <tr>
+              <td><strong>Tooling Protocols Supported</strong></td>
+              <td><span class="tag-warn">⚠️ Proprietary chat UI</span></td>
+              <td><span class="tag-warn">⚠️ Custom Python script runners</span></td>
+              <td class="highlight"><span class="tag-yes">✔ Universal MCP (Claude, Cursor, Antigravity)</span></td>
+            </tr>
+            <tr>
+              <td><strong>Automated CI/CD PR Gates</strong></td>
+              <td><span class="tag-no">❌ None</span></td>
+              <td><span class="tag-no">❌ None</span></td>
+              <td class="highlight"><span class="tag-yes">✔ 1-Click GitHub Actions Invariant Gate</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 1-Click Export Hub -->
+    <section class="export-section" id="exportHub">
+      <div class="matrix-header">
+        <span class="badge-pill badge-emerald">INTEGRATION &amp; EXPORT HUB</span>
+        <h2>Export Invariants to Your Tool of Choice</h2>
+        <p style="color: var(--text-secondary); max-width: 650px; margin: 8px auto 0;">Take the verified invariants and rules and drop them straight into your team's workflow.</p>
+      </div>
+
+      <div class="export-grid">
+        <div class="export-card">
+          <div>
+            <h4><span>📋</span> Cursor Rules (.cursorrules)</h4>
+            <p>Export Fable 5.1 Architect mode instructions as a system prompt for Cursor IDE.</p>
+          </div>
+          <button class="export-card-btn" onclick="exportCursorRules()">Copy .cursorrules</button>
+        </div>
+
+        <div class="export-card">
+          <div>
+            <h4><span>🤖</span> Claude Code Skill (SKILL.md)</h4>
+            <p>Production Claude Code skill definition for autonomous multi-agent task execution.</p>
+          </div>
+          <button class="export-card-btn" onclick="exportClaudeSkill()">Copy SKILL.md</button>
+        </div>
+
+        <div class="export-card">
+          <div>
+            <h4><span>🚀</span> GitHub Actions Gate (.yml)</h4>
+            <p>Zero-cost CI/CD pipeline step that blocks pull requests if tacit invariants fail.</p>
+          </div>
+          <button class="export-card-btn" onclick="exportGithubAction()">Copy CI/CD Workflow</button>
+        </div>
+
+        <div class="export-card">
+          <div>
+            <h4><span>🛡️</span> Provenance Audit JSON</h4>
+            <p>Download the machine-readable verification worklog of the current simulation.</p>
+          </div>
+          <button class="export-card-btn" onclick="exportAuditJSON()">Copy JSON Worklog</button>
         </div>
       </div>
     </section>

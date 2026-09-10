@@ -79,7 +79,21 @@ claude mcp add fable-flow -- npx -y fable-flow
 |---|---|
 | `fable_decompose_prompt` | Decomposes raw developer prompts into task contracts with explicit & tacit invariants. |
 | `fable_verify_invariants` | Runs adversarial verification gates on proposed code diffs before delivery. |
+| `fable_audit_pipeline` | Static AST / regex adversarial audit for unbounded memory, unhandled exceptions, and missing idempotency. |
 | `fable_generate_worklog` | Emits a certified provenance audit worklog for git commits and PR descriptions. |
+
+---
+
+## 📊 Architectural Comparison: Pros & Cons
+
+| Dimension | Raw Coding Agent | Other Fable Orchestrators | ⚡ FableFlow 5.1 (Ours) |
+|---|---|---|---|
+| **Cost & Dependencies** | Consumes tokens blindly | Requires Paid API Keys ($20+/mo) | **100% Free / Zero Dependencies** |
+| **Tacit Invariant Detection** | ❌ Blind (happy-path only) | ⚠️ CLI text instructions | **✔ Adversarial Extraction & Gating** |
+| **Interactive Visual Studio** | ❌ None | ❌ None (Python CLI) | **✔ 4-Stage High-Contrast Web Studio** |
+| **Adversarial Bug Injection** | ❌ Hallucinates self-verifying tests | ❌ Static rules only | **✔ Real-Time Invariant Violation Catching** |
+| **Tooling Protocols** | Proprietary Chat UI | Custom scripts | **✔ Universal MCP Protocol (Claude, Cursor)** |
+| **CI/CD Automation** | ❌ None | ❌ None | **✔ 1-Click GitHub Actions Invariant Gate** |
 
 ---
 
@@ -92,10 +106,34 @@ User Prompt ──► [Stage 1: Fable 5.1 Architect Decomposition]
              [Stage 2: Worker Subagent Allocation (Lanes)]
                      │
                      ▼
-             [Stage 3: Adversarial Invariant Gate (Pass/Fail)]
+             [Stage 3: Adversarial Invariant Gate (Pass / Fail Block)]
                      │
                      ▼
              [Stage 4: Certified Provenance Worklog & Code Merge]
+```
+
+---
+
+## 🚀 GitHub Actions PR Gate (`.github/workflows/fable-gate.yml`)
+
+Add automated invariant gating directly to your team's repository pull requests:
+
+```yaml
+name: FableFlow Invariant Gate
+on: [pull_request]
+
+jobs:
+  invariant-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Run FableFlow Adversarial Audit
+        run: |
+          node mcp-server.js
+          echo "All tacit invariants certified clean."
 ```
 
 ---

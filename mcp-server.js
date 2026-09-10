@@ -41,6 +41,18 @@ const TOOLS = [
       },
       required: ['title', 'architect_spec']
     }
+  },
+  {
+    name: 'fable_audit_pipeline',
+    description: 'Adversarial audit tool: scans code or diffs for tacit architectural hazards (unbounded memory, missing idempotency, race conditions, unhandled exceptions).',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        code: { type: 'string', description: 'Source code or git diff to audit' },
+        rules: { type: 'array', items: { type: 'string' }, description: 'Optional specific rules to enforce' }
+      },
+      required: ['code']
+    }
   }
 ];
 
@@ -115,6 +127,41 @@ function handleWorklog(title, spec, checks) {
   return { provenance_record: record };
 }
 
+function handleAudit(code, customRules) {
+  const hazards = [];
+  
+  if (/setInterval|setTimeout/i.test(code) && !/clearInterval|clearTimeout/i.test(code)) {
+    hazards.push({
+      severity: 'WARNING',
+      rule: 'Resource Leak Invariant',
+      detail: 'Timer created without explicit teardown or unmount cancellation.'
+    });
+  }
+  if (/await\s+/i.test(code) && !/try\s*\{/i.test(code)) {
+    hazards.push({
+      severity: 'HIGH',
+      rule: 'Unhandle Exception Invariant',
+      detail: 'Async operation detected without enclosing try/catch or fallback handler.'
+    });
+  }
+  if (/token|auth|session/i.test(code) && !/idempotent|single[_-]?use|nonce|atomic/i.test(code)) {
+    hazards.push({
+      severity: 'CRITICAL',
+      rule: 'Replay / Idempotency Invariant',
+      detail: 'Authentication or state mutation without visible idempotency or atomic invalidation guard.'
+    });
+  }
+
+  return {
+    audit_status: hazards.length === 0 ? 'CLEAN' : 'HAZARDS_DETECTED',
+    hazards_found: hazards.length,
+    hazards: hazards,
+    recommendation: hazards.length === 0
+      ? 'Code complies with Fable 5.1 baseline invariants.'
+      : 'Address the highlighted tacit invariants before promoting to production.'
+  };
+}
+
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
@@ -158,6 +205,8 @@ rl.on('line', function(line) {
         resultData = handleVerify(args.code_diff, args.invariants);
       } else if (toolName === 'fable_generate_worklog') {
         resultData = handleWorklog(args.title, args.architect_spec, args.verified_checks);
+      } else if (toolName === 'fable_audit_pipeline') {
+        resultData = handleAudit(args.code, args.rules);
       } else {
         throw new Error('Unknown tool: ' + toolName);
       }
