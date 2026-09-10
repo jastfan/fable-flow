@@ -21,6 +21,12 @@ claude mcp add fable-flow -- npx -y fable-flow
 
 <br/>
 
+<a href="https://jastfan.github.io/fable-flow/">
+  <img src="assets/fable-flow-studio.png" alt="FableFlow 5.1 Multi-Agent Architect Studio Preview" width="100%" style="border-radius: 12px; border: 1px solid rgba(56, 189, 248, 0.3); box-shadow: 0 16px 40px rgba(0,0,0,0.6);" />
+</a>
+
+<br/>
+
 👉 **[Launch the Live FableFlow Visual Studio](https://jastfan.github.io/fable-flow/)** to simulate task decomposition, adversarial bug injection, and invariant gates in real-time.
 
 </div>
@@ -29,9 +35,12 @@ claude mcp add fable-flow -- npx -y fable-flow
 
 ## 📑 Table of Contents
 
+- [What is FableFlow & How Does a Developer Use It?](#-what-is-fableflow--how-does-a-developer-use-it)
+- [How FableFlow Solves Flaws in Existing Fable Repos](#-how-fableflow-solves-flaws-in-existing-fable-repos)
 - [Why FableFlow? The Verification Bottleneck](#-why-fableflow-the-verification-bottleneck)
 - [The 4-Stage Architecture Ladder](#-the-4-stage-architecture-ladder)
 - [Architectural Comparison: Pros & Cons](#-architectural-comparison-pros--cons)
+- [Real LLM Configuration (BYOK)](#-real-llm-configuration-bring-your-own-key--byok)
 - [Exposed MCP Server Tools (Backend Engine)](#-exposed-mcp-server-tools-backend-engine)
 - [Interactive Visual Studio (Frontend Engine)](#-interactive-visual-studio-frontend-engine)
 - [1-Click IDE & Agent Setup](#-1-click-ide--agent-setup)
@@ -42,6 +51,56 @@ claude mcp add fable-flow -- npx -y fable-flow
 - [License & Authorship](#-license--authorship)
 
 ---
+
+## 💡 What is FableFlow & How Does a Developer Use It?
+
+### The Core Concept in 30 Seconds
+When you ask an autonomous AI agent (Claude Code, Cursor Composer, Windsurf) to build a feature, the agent acts like a junior developer on an adrenaline rush: **it rushes to write lines of code without considering unstated architectural requirements**.
+
+For example, if you ask: *"Build a password reset endpoint"*:
+- The raw agent writes the happy-path code in 30 seconds.
+- It tests that valid tokens reset the password.
+- **The Disaster**: It completely forgets that during network retries or concurrent clicks, the same token could be redeemed twice within a 200ms race window (a replay exploit!).
+
+**FableFlow solves this by introducing the Master Architect & Invariant Gate:**
+Before any code is merged, FableFlow extracts **tacit invariants** (rules that must NEVER be broken) and runs an **adversarial gate**. If the agent's code allows token replay or memory leaks, FableFlow rejects the code and forces the agent to fix it.
+
+---
+
+### How You Actually Use It (3 Simple Workflows):
+
+#### Workflow A: With Claude Code (CLI)
+1. Add FableFlow once:
+   ```bash
+   claude mcp add fable-flow -- npx -y fable-flow
+   ```
+2. Now, simply talk to Claude Code as normal:
+   > *"Claude, implement a high-throughput telemetry stream for edge IoT devices."*
+3. Claude automatically invokes FableFlow's `fable_decompose_prompt` to lock in memory bounds, calls worker models to write the diff, and runs `fable_verify_invariants` before touching your git branch.
+
+#### Workflow B: With Cursor IDE / Windsurf
+1. Add FableFlow to `.cursor/mcp.json`.
+2. Add `.cursorrules` using our 1-click export from the Visual Studio.
+3. When you use Cursor Composer (`Cmd+I` / `Ctrl+I`), it automatically follows the 4-stage Fable Architect ladder.
+
+#### Workflow C: Interactive Web Visual Studio
+1. Open **[https://jastfan.github.io/fable-flow/](https://jastfan.github.io/fable-flow/)**.
+2. Click **⚙️ Connect Real LLM (BYOK)** to plug in your Anthropic, OpenAI, DeepSeek key or local Ollama URL (stored safely in your browser).
+3. Type any custom prompt or select a preset.
+4. Toggle between **🛡️ Contract Pass** and **⚠️ Inject Bug (Fail Gate)** to visually inspect how adversarial failure gates block silent regressions.
+
+---
+
+## 🔍 How FableFlow Solves Flaws in Existing Fable Repos
+
+We studied existing popular Fable and multi-agent repositories (`codejunkie99/fable-orchestrator`, `DannyMac180/fable-advisor`, `mrtooher/fable-mode`) and systematically eliminated their biggest shortcomings:
+
+| Existing Repo | Their Biggest Limitation / Con | How FableFlow Solves It ⚡ |
+|---|---|---|
+| **`fable-orchestrator`** | Heavy Python environment, complex CLI configuration, no visual interface to observe agent decisions. | **Zero-Dependency Native Node.js**: Installs in 1 second via `npx -y fable-flow`. Includes a high-contrast 4-stage web visualizer. |
+| **`fable-advisor`** | Static prompt checklist only; cannot be executed as a live MCP tool or in CI/CD pipelines. | **Executable MCP Server + CI/CD Gate**: Functions as an active stdio JSON-RPC server and an automated GitHub Actions PR barrier. |
+| **`fable-mode`** | Pure system prompt text; no runtime invariant enforcement or bug injection testing. | **Adversarial Failure Simulation**: Includes dynamic bug injection to verify that gates actively catch race conditions and memory leaks. |
+| **Generic Coding Agents** | 52% silent regression rate due to self-fulfilling test hallucinations. | **Decoupled Architect & QC Lanes**: Architectural contracts are separated from worker implementation code. |
 
 ## 🚀 Why FableFlow? The Verification Bottleneck
 
