@@ -1,0 +1,20 @@
+name: FableFlow Invariant Gate
+on: [pull_request, push]
+
+jobs:
+  invariant-gate:
+    name: Adversarial Invariant Verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run FableFlow MCP Test Suite
+        run: |
+          node test/test-mcp.js
+          echo "✔ All Fable 5.1 architectural invariants verified clean."
