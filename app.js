@@ -310,7 +310,7 @@ function sleep(ms) {
 }
 
 function copyClaudeCommand() {
-  copyText('claude mcp add fable-flow -- npx -y fable-flow');
+  copyText('claude mcp add fable-flow -- npx -y github:jastfan/fable-flow');
   const btn = document.getElementById('quickCopyBtn');
   const tag = btn.querySelector('.copy-tag');
   tag.innerText = 'Copied!';

@@ -15,8 +15,8 @@
 <br/>
 
 ```bash
-# ⚡ 1-Click Coding Agent Integration (Claude Code)
-claude mcp add fable-flow -- npx -y fable-flow
+# ⚡ 1-Click Coding Agent Integration (Claude Code via GitHub)
+claude mcp add fable-flow -- npx -y github:jastfan/fable-flow
 ```
 
 <br/>
@@ -72,7 +72,7 @@ Before any code is merged, FableFlow extracts **tacit invariants** (rules that m
 #### Workflow A: With Claude Code (CLI)
 1. Add FableFlow once:
    ```bash
-   claude mcp add fable-flow -- npx -y fable-flow
+   claude mcp add fable-flow -- npx -y github:jastfan/fable-flow
    ```
 2. Now, simply talk to Claude Code as normal:
    > *"Claude, implement a high-throughput telemetry stream for edge IoT devices."*
@@ -239,7 +239,7 @@ Built with high-performance Vanilla HTML5, CSS3, and JavaScript (zero build step
 ### 1. Claude Code
 Run this single command in your terminal:
 ```bash
-claude mcp add fable-flow -- npx -y fable-flow
+claude mcp add fable-flow -- npx -y github:jastfan/fable-flow
 ```
 
 ### 2. Cursor IDE (`.cursor/mcp.json`)
@@ -249,7 +249,7 @@ Add to your project's `.cursor/mcp.json`:
   "mcpServers": {
     "fable-flow": {
       "command": "npx",
-      "args": ["-y", "fable-flow"]
+      "args": ["-y", "github:jastfan/fable-flow"]
     }
   }
 }
@@ -262,7 +262,7 @@ Add to your `mcp_config.json`:
   "mcpServers": {
     "fable-flow": {
       "command": "npx",
-      "args": ["-y", "fable-flow"]
+      "args": ["-y", "github:jastfan/fable-flow"]
     }
   }
 }
