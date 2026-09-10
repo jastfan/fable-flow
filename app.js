@@ -183,6 +183,7 @@ function resetPipelineDisplay() {
 async function runArchitectSimulation() {
   const btn = document.getElementById('runFlowBtn');
   const statusBadge = document.getElementById('pipelineStatusBadge');
+  const taskText = document.getElementById('taskInput').value.trim();
   const preset = PRESETS[currentPresetKey] || PRESETS.auth;
   const isPass = currentAuditMode === 'pass';
 
@@ -192,18 +193,36 @@ async function runArchitectSimulation() {
     ? '⚡ Fable 5.1 Orchestrating...' 
     : '⚠️ Running Invariant Gate with Injected Bug...';
 
+  // Check if user has connected a live LLM
+  let liveAiResult = null;
+  try {
+    liveAiResult = await callLiveBrowserLLM(taskText);
+  } catch (err) {
+    console.warn('Live LLM call error, using local simulation:', err.message);
+  }
+
   // STAGE 1: Architect Decomposition
   const stage1Card = document.getElementById('stage1Card');
   stage1Card.className = 'pipeline-stage-card active';
-  document.getElementById('stage1Body').innerHTML = `
-    <div class="contract-box">
-      <div class="contract-title">${preset.stage1.contract}</div>
-      <p><strong>Objective:</strong> ${preset.stage1.objective}</p>
-      <ul class="invariants-list">
-        ${preset.stage1.invariants.map(inv => `<li><span class="bullet">🛡️</span> <span>${inv}</span></li>`).join('')}
-      </ul>
-    </div>
-  `;
+
+  if (liveAiResult) {
+    document.getElementById('stage1Body').innerHTML = `
+      <div class="contract-box">
+        <div class="contract-title">LIVE INFERENCE: ${liveAiResult.provider}</div>
+        <pre style="white-space: pre-wrap; font-family: var(--font-mono); font-size: 0.8rem; color: #e2e8f0; margin-top: 8px;">${liveAiResult.text}</pre>
+      </div>
+    `;
+  } else {
+    document.getElementById('stage1Body').innerHTML = `
+      <div class="contract-box">
+        <div class="contract-title">${preset.stage1.contract}</div>
+        <p><strong>Objective:</strong> ${preset.stage1.objective}</p>
+        <ul class="invariants-list">
+          ${preset.stage1.invariants.map(inv => `<li><span class="bullet">🛡️</span> <span>${inv}</span></li>`).join('')}
+        </ul>
+      </div>
+    `;
+  }
   await sleep(600);
   stage1Card.className = 'pipeline-stage-card passed';
 
@@ -389,7 +408,183 @@ function exportAuditJSON() {
   alert('Copied Provenance Audit JSON to clipboard!');
 }
 
-// Initialize default preset on load
+/* ==========================================================================
+   Real LLM Provider & BYOK Connection Logic (Client-Side)
+   ========================================================================== */
+
+function getApiConfig() {
+  return {
+    provider: localStorage.getItem('fable_provider') || 'anthropic',
+    apiKey: localStorage.getItem('fable_api_key') || '',
+    endpoint: localStorage.getItem('fable_endpoint') || 'http://localhost:11434'
+  };
+}
+
+function updateApiStatusUI() {
+  const config = getApiConfig();
+  const statusEl = document.getElementById('navApiStatusText');
+  const btn = document.getElementById('navApiBtn');
+  if (config.apiKey || (config.provider === 'ollama' && config.endpoint)) {
+    const nameMap = { anthropic: 'Claude Live', openai: 'OpenAI Live', deepseek: 'DeepSeek Live', ollama: 'Ollama Live' };
+    statusEl.innerText = `${nameMap[config.provider] || 'Live LLM'} Active`;
+    btn.style.borderColor = 'var(--accent-emerald)';
+    btn.style.color = 'var(--accent-emerald)';
+  } else {
+    statusEl.innerText = 'Connect Real LLM (BYOK)';
+    btn.style.borderColor = 'rgba(56, 189, 248, 0.35)';
+    btn.style.color = 'var(--accent-cyan)';
+  }
+}
+
+function openApiModal() {
+  const config = getApiConfig();
+  document.getElementById('providerSelect').value = config.provider;
+  document.getElementById('apiKeyInput').value = config.apiKey;
+  document.getElementById('endpointInput').value = config.endpoint;
+  onProviderChange();
+  document.getElementById('apiModal').classList.add('active');
+}
+
+function closeApiModal() {
+  document.getElementById('apiModal').classList.remove('active');
+}
+
+function onProviderChange() {
+  const provider = document.getElementById('providerSelect').value;
+  const isOllama = provider === 'ollama';
+  document.getElementById('apiKeyField').style.display = isOllama ? 'none' : 'flex';
+  document.getElementById('endpointField').style.display = isOllama ? 'flex' : 'none';
+}
+
+function saveApiSettings() {
+  const provider = document.getElementById('providerSelect').value;
+  const apiKey = document.getElementById('apiKeyInput').value.trim();
+  const endpoint = document.getElementById('endpointInput').value.trim();
+
+  localStorage.setItem('fable_provider', provider);
+  localStorage.setItem('fable_api_key', apiKey);
+  localStorage.setItem('fable_endpoint', endpoint);
+
+  updateApiStatusUI();
+  closeApiModal();
+  alert(`Connected to ${provider.toUpperCase()}! Your API Key is stored safely in local browser storage.`);
+}
+
+function clearApiKey() {
+  localStorage.removeItem('fable_provider');
+  localStorage.removeItem('fable_api_key');
+  localStorage.removeItem('fable_endpoint');
+  updateApiStatusUI();
+  closeApiModal();
+  alert('Disconnected from live API. Running in local high-fidelity sandbox mode.');
+}
+
+async function callLiveBrowserLLM(userPrompt) {
+  const config = getApiConfig();
+  if (!config.apiKey && config.provider !== 'ollama') return null;
+
+  const systemPrompt = `You are Claude Fable 5.1 Master Architect. Decompose the given engineering requirement into:
+1. Formal Task Contract
+2. Explicit & Tacit Invariants to guard (single-use idempotency, O(1) bounded memory, fail-closed fallback)
+3. Multi-Agent lanes (Stage 1 Architect, Stage 2 Worker, Stage 3 Gate, Stage 4 Audit).
+Return clean, structured technical analysis.`;
+
+  if (config.provider === 'anthropic') {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': config.apiKey,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-3-7-sonnet-20250219',
+        max_tokens: 1500,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userPrompt }]
+      })
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(`Claude API error (${res.status}): ${err}`);
+    }
+    const data = await res.json();
+    return { provider: 'Anthropic Claude 3.7 Sonnet', text: data.content[0].text };
+  }
+
+  if (config.provider === 'openai') {
+    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${config.apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ]
+      })
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(`OpenAI API error (${res.status}): ${err}`);
+    }
+    const data = await res.json();
+    return { provider: 'OpenAI GPT-4o', text: data.choices[0].message.content };
+  }
+
+  if (config.provider === 'deepseek') {
+    const res = await fetch('https://api.deepseek.com/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${config.apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ]
+      })
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(`DeepSeek API error (${res.status}): ${err}`);
+    }
+    const data = await res.json();
+    return { provider: 'DeepSeek Chat', text: data.choices[0].message.content };
+  }
+
+  if (config.provider === 'ollama') {
+    const res = await fetch(`${config.endpoint.replace(/\/$/, '')}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'deepseek-r1',
+        stream: false,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ]
+      })
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(`Ollama error (${res.status}): ${err}`);
+    }
+    const data = await res.json();
+    return { provider: 'Ollama Local (deepseek-r1)', text: data.message.content };
+  }
+
+  return null;
+}
+
+// Initialize default preset and API status on load
 window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('taskInput').value = PRESETS.auth.prompt;
+  updateApiStatusUI();
 });

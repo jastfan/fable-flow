@@ -77,15 +77,47 @@ FableFlow decouples **Architectural Specification** from **Worker Implementation
 
 Why FableFlow 5.1 outclasses raw coding agents and heavy alternative orchestrators:
 
-| Feature Dimension | Raw Coding Agent | Other Fable Tools (`fable-orchestrator`) | ⚡ FableFlow 5.1 (Ours) |
+| Feature Dimension | Raw Coding Agent | Traditional Orchestrators | ⚡ FableFlow 5.1 |
 |---|---|---|---|
-| **Cost & API Keys** | Burns expensive tokens blindly | Requires Paid Anthropic/OpenAI API keys ($20+/mo) | **100% Free & Zero-Dependency ($0 Cost)** |
-| **Tacit Invariant Detection** | ❌ Blind (happy-path only) | ⚠️ Text prompt guidelines only | **✔ Formal Invariant Extraction & Gate Gating** |
+| **Inference & Billing Model** | Uncontrolled token consumption | Proprietary SaaS fee + API cost | **BYOK (Bring Your Own Key): Direct Anthropic / OpenAI / DeepSeek / Ollama with 0% markup** |
+| **Tacit Invariant Detection** | ❌ Blind (happy-path only) | ⚠️ Prompt guidelines without gates | **✔ Formal Invariant Extraction & Adversarial Gate** |
 | **Visual Verification Studio** | ❌ None (CLI/Terminal only) | ❌ None (Terminal only) | **✔ 4-Stage High-Contrast Dark Web Studio** |
 | **Adversarial Bug Simulation** | ❌ Hallucinates self-verifying tests | ❌ Static assertions only | **✔ Real-Time Invariant Failure Injection** |
-| **Zero-Config MCP Server** | ❌ Proprietary chat UI | ⚠️ Complex Python environment setup | **✔ Native Node.js JSON-RPC MCP Server** |
+| **Zero-Config MCP Server** | ❌ Proprietary chat UI | ⚠️ Heavy Python dependency chains | **✔ Native Node.js JSON-RPC MCP Server** |
 | **1-Click Export Hub** | ❌ None | ❌ None | **✔ Export to `.cursorrules`, `SKILL.md`, CI/CD** |
 | **Automated PR Invariant Gate** | ❌ None | ❌ None | **✔ 1-Click GitHub Actions Invariant Gate** |
+
+---
+
+## 🔑 Real LLM Configuration (Bring Your Own Key — BYOK)
+
+FableFlow believes in **full developer sovereignty**: zero vendor lock-in, zero middleman markup. You connect directly to your chosen AI model provider using your own credentials.
+
+### Supported Providers:
+1. **Anthropic Claude** (`claude-3-7-sonnet`, `claude-3-5-sonnet`)
+2. **OpenAI** (`gpt-4o`, `o3-mini`)
+3. **DeepSeek** (`deepseek-chat`, `deepseek-reasoner`)
+4. **Local Ollama** (Run local offline models like `deepseek-r1` or `llama3` for $0 compute cost)
+
+### Setting Environment Variables (for MCP Server & CLI):
+Create a `.env` file or export in your terminal / IDE configuration:
+
+```bash
+# Option A: Anthropic Claude (Recommended for Fable 5.1 Architect mode)
+export ANTHROPIC_API_KEY="sk-ant-..."
+
+# Option B: OpenAI
+export OPENAI_API_KEY="sk-..."
+
+# Option C: DeepSeek
+export DEEPSEEK_API_KEY="sk-..."
+
+# Option D: Local Ollama (Zero cloud cost)
+export OLLAMA_HOST="http://localhost:11434"
+export FABLE_MODEL="deepseek-r1"
+```
+
+> **Offline Sandbox Mode**: If no API key is set, FableFlow runs in deterministic offline sandbox mode, allowing you to test pipeline gates and CI/CD checks without consuming any API credits.
 
 ---
 

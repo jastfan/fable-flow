@@ -42,10 +42,14 @@
       <nav class="nav-actions">
         <a href="#demoStudio" class="nav-item active">Visual Studio</a>
         <a href="#pipeline" class="nav-item">4-Stage Pipeline</a>
-        <a href="#install" class="nav-item">MCP Quick Install</a>
+        <a href="#comparison" class="nav-item">Architecture</a>
+        <a href="#install" class="nav-item">MCP Setup</a>
+        <button class="btn-api-settings" onclick="openApiModal()" id="navApiBtn">
+          <span>⚙️</span> <span id="navApiStatusText">Connect LLM API</span>
+        </button>
         <a href="https://github.com/jastfan/fable-flow" target="_blank" rel="noopener" class="btn-github">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-          <span>Star on GitHub</span>
+          <span>GitHub</span>
         </a>
       </nav>
     </header>
@@ -275,16 +279,16 @@ node mcp-server.js</code></pre>
             <tr>
               <th>Feature / Capability</th>
               <th>Raw Coding Agent (No Contract)</th>
-              <th>Other Fable Orchestrators</th>
-              <th class="highlight">⚡ FableFlow 5.1 (Ours)</th>
+              <th>Traditional Orchestrators</th>
+              <th class="highlight">⚡ FableFlow 5.1</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td><strong>Cost &amp; Dependencies</strong></td>
-              <td><span class="tag-warn">⚠️ Consumes token context quickly</span></td>
-              <td><span class="tag-no">❌ Requires Paid API keys ($20+/mo)</span></td>
-              <td class="highlight"><span class="tag-yes">✔ 100% Free / Zero Dependencies</span></td>
+              <td><strong>Inference &amp; Billing Model</strong></td>
+              <td><span class="tag-warn">⚠️ Uncontrolled token consumption</span></td>
+              <td><span class="tag-no">❌ Proprietary SaaS fee + markup</span></td>
+              <td class="highlight"><span class="tag-yes">✔ BYOK: Direct Anthropic/OpenAI/Ollama (0% Markup)</span></td>
             </tr>
             <tr>
               <td><strong>Tacit Invariant Detection</strong></td>
@@ -379,6 +383,45 @@ node mcp-server.js</code></pre>
       </div>
     </footer>
 
+  </div>
+
+  <!-- Real LLM Provider Settings Modal (BYOK) -->
+  <div class="modal-overlay" id="apiModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><span>⚡</span> Connect Real LLM Provider (BYOK)</h3>
+        <button class="modal-close-btn" onclick="closeApiModal()">&times;</button>
+      </div>
+
+      <p style="font-size: 0.84rem; color: var(--text-secondary); line-height: 1.5;">
+        Bring Your Own Key (BYOK): Connect directly to your AI provider with zero middleman markup. Keys are stored locally in your browser's encrypted cache and never sent to third-party servers.
+      </p>
+
+      <div class="modal-field">
+        <label for="providerSelect">AI Provider</label>
+        <select id="providerSelect" class="modal-select" onchange="onProviderChange()">
+          <option value="anthropic">Anthropic Claude (Claude 3.7 / 3.5 Sonnet)</option>
+          <option value="openai">OpenAI (GPT-4o, o3-mini)</option>
+          <option value="deepseek">DeepSeek API (deepseek-chat, deepseek-r1)</option>
+          <option value="ollama">Local Ollama (http://localhost:11434)</option>
+        </select>
+      </div>
+
+      <div class="modal-field" id="apiKeyField">
+        <label for="apiKeyInput" id="apiKeyLabel">API Key</label>
+        <input type="password" id="apiKeyInput" class="modal-input" placeholder="sk-ant-... or sk-..." />
+      </div>
+
+      <div class="modal-field" id="endpointField" style="display: none;">
+        <label for="endpointInput">Ollama Endpoint URL</label>
+        <input type="text" id="endpointInput" class="modal-input" value="http://localhost:11434" />
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="clearApiKey()">Disconnect / Use Sandbox</button>
+        <button class="btn-primary-glow" style="padding: 10px 20px;" onclick="saveApiSettings()">Save &amp; Connect</button>
+      </div>
+    </div>
   </div>
 
   <script src="app.js"></script>

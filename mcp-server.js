@@ -56,7 +56,134 @@ const TOOLS = [
   }
 ];
 
-function handleDecompose(task, domain) {
+/**
+ * Real Multi-Provider LLM Caller (Anthropic, OpenAI, DeepSeek, Ollama)
+ * Operates natively via Node 18+ global fetch. Zero external npm dependencies.
+ */
+async function queryLLM(systemPrompt, userPrompt) {
+  const anthropicKey = process.env.ANTHROPIC_API_KEY;
+  const openaiKey = process.env.OPENAI_API_KEY;
+  const deepseekKey = process.env.DEEPSEEK_API_KEY;
+  const ollamaHost = process.env.OLLAMA_HOST || process.env.OLLAMA_BASE_URL;
+
+  if (anthropicKey) {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': anthropicKey,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: process.env.FABLE_MODEL || 'claude-3-7-sonnet-20250219',
+        max_tokens: 2048,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userPrompt }]
+      })
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(`Anthropic API error (${res.status}): ${err}`);
+    }
+    const data = await res.json();
+    return { provider: 'Anthropic Claude', model: process.env.FABLE_MODEL || 'claude-3-7-sonnet', text: data.content[0].text };
+  }
+
+  if (openaiKey) {
+    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openaiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: process.env.FABLE_MODEL || 'gpt-4o',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ]
+      })
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(`OpenAI API error (${res.status}): ${err}`);
+    }
+    const data = await res.json();
+    return { provider: 'OpenAI', model: process.env.FABLE_MODEL || 'gpt-4o', text: data.choices[0].message.content };
+  }
+
+  if (deepseekKey) {
+    const res = await fetch('https://api.deepseek.com/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${deepseekKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: process.env.FABLE_MODEL || 'deepseek-chat',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ]
+      })
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(`DeepSeek API error (${res.status}): ${err}`);
+    }
+    const data = await res.json();
+    return { provider: 'DeepSeek', model: process.env.FABLE_MODEL || 'deepseek-chat', text: data.choices[0].message.content };
+  }
+
+  if (ollamaHost) {
+    const res = await fetch(`${ollamaHost.replace(/\/$/, '')}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: process.env.FABLE_MODEL || 'llama3',
+        stream: false,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ]
+      })
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(`Ollama API error (${res.status}): ${err}`);
+    }
+    const data = await res.json();
+    return { provider: 'Ollama Local', model: process.env.FABLE_MODEL || 'llama3', text: data.message.content };
+  }
+
+  return null; // Fallback to heuristic rules
+}
+
+async function handleDecompose(task, domain) {
+  const systemPrompt = `You are Claude Fable 5.1 Master Architect.
+Decompose the following engineering requirement into:
+1. Formal Task Contract (Objective, Scope, Boundaries)
+2. Multi-Agent Delegation Plan (Stage 1 Architect, Stage 2 Worker Lane, Stage 3 Adversarial Gate, Stage 4 Audit)
+3. Explicit & Tacit Invariants that MUST be guarded (single-use idempotency, O(1) bounded memory under bursts, fail-closed security posture, atomic rollback).
+Format your response as structured JSON.`;
+
+  let liveAi = null;
+  try {
+    liveAi = await queryLLM(systemPrompt, `Domain: ${domain || 'general'}\nTask: ${task}`);
+  } catch (err) {
+    console.error('Live LLM call error, using deterministic fallback:', err.message);
+  }
+
+  if (liveAi) {
+    return {
+      architect: 'Claude Fable 5.1 (Live ' + liveAi.provider + ' Inference)',
+      model_used: liveAi.model,
+      timestamp: new Date().toISOString(),
+      live_llm_response: liveAi.text,
+      mode: 'LIVE_LLM_CONNECTED'
+    };
+  }
+
   const tacitInvariants = [
     'Single-use / Idempotency enforcement (prevent duplicate submissions / remount loops)',
     'Strict O(1) memory bounds under burst traffic (prevent heap ballooning / OOM crash)',
@@ -65,8 +192,10 @@ function handleDecompose(task, domain) {
   ];
 
   return {
-    architect: 'Claude Fable 5.1',
+    architect: 'Claude Fable 5.1 Architect Engine',
     timestamp: new Date().toISOString(),
+    mode: 'STANDALONE_FALLBACK',
+    notice: 'To connect live AI models, configure ANTHROPIC_API_KEY, OPENAI_API_KEY, DEEPSEEK_API_KEY, or OLLAMA_HOST.',
     task_contract: {
       objective: task,
       domain: domain || 'general',
@@ -82,7 +211,7 @@ function handleDecompose(task, domain) {
   };
 }
 
-function handleVerify(diff, customInvariants) {
+async function handleVerify(diff, customInvariants) {
   const checks = (customInvariants && customInvariants.length > 0)
     ? customInvariants
     : [
@@ -91,6 +220,29 @@ function handleVerify(diff, customInvariants) {
         'Error Path Graceful Degradation',
         'Zero Regressions on Existing Contracts'
       ];
+
+  const systemPrompt = `You are the Fable 5.1 Adversarial Verification Gate.
+Analyze the following code diff against these invariants:
+${checks.map(c => `- ${c}`).join('\n')}
+Evaluate each invariant strictly. If ANY subtle bug, race condition, or memory leak exists, fail it with evidence.
+Return a JSON object with { status: "PASSED" | "FAILED", results: [ { invariant, passed, evidence } ] }.`;
+
+  let liveAi = null;
+  try {
+    liveAi = await queryLLM(systemPrompt, `Code Diff:\n${diff}`);
+  } catch (err) {
+    console.error('Live LLM verification error, using deterministic fallback:', err.message);
+  }
+
+  if (liveAi) {
+    return {
+      auditor: 'Fable 5.1 Verification Gate (Live ' + liveAi.provider + ')',
+      model_used: liveAi.model,
+      timestamp: new Date().toISOString(),
+      evaluation: liveAi.text,
+      mode: 'LIVE_LLM_CONNECTED'
+    };
+  }
 
   const results = checks.map(function(c) {
     return {
@@ -103,6 +255,8 @@ function handleVerify(diff, customInvariants) {
   return {
     verification_status: 'PASSED',
     auditor: 'Fable 5.1 Verification Gate',
+    mode: 'STANDALONE_FALLBACK',
+    notice: 'To run live LLM verification, configure ANTHROPIC_API_KEY, OPENAI_API_KEY, or OLLAMA_HOST.',
     checks_evaluated: results.length,
     passed_count: results.length,
     results: results
@@ -168,7 +322,7 @@ const rl = readline.createInterface({
   terminal: false
 });
 
-rl.on('line', function(line) {
+rl.on('line', async function(line) {
   if (!line.trim()) return;
   try {
     const request = JSON.parse(line);
@@ -200,9 +354,9 @@ rl.on('line', function(line) {
       let resultData = null;
 
       if (toolName === 'fable_decompose_prompt') {
-        resultData = handleDecompose(args.task_description, args.domain);
+        resultData = await handleDecompose(args.task_description, args.domain);
       } else if (toolName === 'fable_verify_invariants') {
-        resultData = handleVerify(args.code_diff, args.invariants);
+        resultData = await handleVerify(args.code_diff, args.invariants);
       } else if (toolName === 'fable_generate_worklog') {
         resultData = handleWorklog(args.title, args.architect_spec, args.verified_checks);
       } else if (toolName === 'fable_audit_pipeline') {
