@@ -321,11 +321,19 @@ FableFlow Visual Studio has zero build step and can be hosted anywhere in second
 4. Your personal instance will immediately be live at:
    `https://<your-github-username>.github.io/fable-flow/`
 
-### 2. Self-Hosting with Any Static Server / Docker
+### 2. Self-Hosting with Docker / Static Server
 Because FableFlow requires zero bundling or compilation, you can deploy it instantly on any cloud or internal enterprise network:
+
 ```bash
-# Serve on port 8080:
+# Option A: Using Docker (Lightweight Alpine Nginx)
+docker build -t fable-flow .
+docker run -d -p 8080:80 fable-flow
+
+# Option B: Using Node (Zero-install via NPX)
 npx serve . -p 8080
+
+# Option C: Using Python
+python -m http.server 8080
 ```
 
 ---
