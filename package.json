@@ -18,5 +18,19 @@
     "cursor"
   ],
   "author": "jastfan",
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jastfan/fable-flow.git"
+  },
+  "homepage": "https://jastfan.github.io/fable-flow/",
+  "bugs": {
+    "url": "https://github.com/jastfan/fable-flow/issues"
+  },
+  "files": [
+    "mcp-server.js",
+    "README.md",
+    "LICENSE",
+    "package.json"
+  ]
 }
