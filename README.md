@@ -45,7 +45,7 @@ claude mcp add fable-flow -- npx -y fable-flow
 - [Interactive Visual Studio (Frontend Engine)](#-interactive-visual-studio-frontend-engine)
 - [1-Click IDE & Agent Setup](#-1-click-ide--agent-setup)
 - [Local Setup & Development Guide](#-local-setup--development-guide)
-- [GitHub Repository Setup & Push Guide](#-github-repository-setup--push-guide)
+- [Self-Hosting & Deployment Guide](#-self-hosting--deployment-guide)
 - [Automated CI/CD Invariant Gate](#-automated-cicd-invariant-gate)
 - [Contributing Guidelines](#-contributing-guidelines)
 - [License & Authorship](#-license--authorship)
@@ -310,33 +310,23 @@ Now open your browser and navigate to:
 
 ---
 
-## 🚀 GitHub Repository Setup & Push Guide
+## 🌐 Self-Hosting & Deployment Guide
 
-If you are initializing or pushing changes from your own machine:
+FableFlow Visual Studio has zero build step and can be hosted anywhere in seconds.
 
+### 1. 1-Click Fork & GitHub Pages Deploy
+1. **Fork this repository** to your personal or organization account.
+2. In your forked repo, navigate to **Settings** ➔ **Pages**.
+3. Under **Build and deployment** ➔ **Source**, select **GitHub Actions** (FableFlow includes `.github/workflows/deploy.yml` preconfigured).
+4. Your personal instance will immediately be live at:
+   `https://<your-github-username>.github.io/fable-flow/`
+
+### 2. Self-Hosting with Any Static Server / Docker
+Because FableFlow requires zero bundling or compilation, you can deploy it instantly on any cloud or internal enterprise network:
 ```bash
-# 1. Initialize git (if new)
-git init
-git branch -M main
-
-# 2. Stage all project files
-git add .
-
-# 3. Create a clean commit
-git commit -m "feat: initial commit of FableFlow 5.1 Multi-Agent Architect Studio"
-
-# 4. Link your remote repository
-git remote add origin https://github.com/jastfan/fable-flow.git
-
-# 5. Push to GitHub
-git push -u origin main
+# Serve on port 8080:
+npx serve . -p 8080
 ```
-
-### Deploying to GitHub Pages
-1. In your GitHub repository, go to **Settings** ➔ **Pages**.
-2. Under **Build and deployment** ➔ **Source**, select **GitHub Actions** (or Deploy from branch `main`).
-3. Your live visual studio will be live at:
-   `https://<your-username>.github.io/fable-flow/`
 
 ---
 
